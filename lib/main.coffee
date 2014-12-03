@@ -3,6 +3,9 @@ WrapGuideElement = require './wrap-guide-element'
 module.exports =
   activate: ->
     atom.workspace.observeTextEditors (editor) ->
-      wrapGuideElement = new WrapGuideElement().initialize(editor)
       editorElement = atom.views.getView(editor)
-      editorElement.querySelector(".underlayer")?.appendChild(wrapGuideElement)
+      setTimeout(setUpWrapGuide.bind(this, editor, editorElement), 100)
+
+setUpWrapGuide = (editor, editorElement) ->
+  wrapGuideElement = new WrapGuideElement().initialize(editor)
+  editorElement.querySelector(".underlayer")?.appendChild(wrapGuideElement)

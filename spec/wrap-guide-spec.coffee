@@ -17,6 +17,9 @@ describe "WrapGuide", ->
     waitsForPromise ->
       atom.packages.activatePackage('wrap-guide')
 
+    runs ->
+      advanceClock()
+
     waitsForPromise ->
       atom.packages.activatePackage('language-javascript')
 
@@ -26,17 +29,21 @@ describe "WrapGuide", ->
 
   describe ".activate", ->
     it "appends a wrap guide to all existing and new editors", ->
-      expect(atom.workspace.getPanes().length).toBe 1
-      expect(workspaceElement.querySelectorAll(".underlayer > .wrap-guide").length).toBe 1
-      atom.workspace.getActivePane().splitRight(copyActiveItem: true)
-      expect(atom.workspace.getPanes().length).toBe 2
-      expect(workspaceElement.querySelectorAll(".underlayer > .wrap-guide").length).toBe 2
-
-    it "positions the guide at the configured column", ->
       width = editor.getDefaultCharWidth() * wrapGuide.getDefaultColumn()
       expect(width).toBeGreaterThan(0)
+
+      expect(atom.workspace.getPanes().length).toBe 1
       expect(getLeftPosition(wrapGuide)).toBe(width)
       expect(wrapGuide).toBeVisible()
+
+      atom.workspace.getActivePane().splitRight(copyActiveItem: true)
+      advanceClock()
+
+      expect(atom.workspace.getPanes().length).toBe 2
+      newEditor = atom.workspace.getActiveTextEditor()
+      newWrapGuide = atom.views.getView(newEditor).querySelector(".wrap-guide")
+      expect(getLeftPosition(newWrapGuide)).toBe(width)
+      expect(newWrapGuide).toBeVisible()
 
   describe "when the font size changes", ->
     it "updates the wrap guide position", ->
